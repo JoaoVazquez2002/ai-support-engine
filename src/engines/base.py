@@ -13,6 +13,26 @@ from abc import ABC, abstractmethod
 from src.schemas import AnalyzeResponse
 
 
+class GenerativeEngineConfigError(Exception):
+    """Error de configuracion en el motor generativo (por ejemplo, falta GEMINI_API_KEY).
+
+    Por que vive aqui y no en `generative.py`:
+    Al definir esta excepcion compartida en la interfaz base, la capa API (`src/main.py`,
+    desarrollada por Mariana) puede capturarla y traducirla a HTTP 503 Service Unavailable
+    sin acoplarse a la implementacion interna del SDK de Gemini (desarrollada por Alan),
+    evitando ademas filtrar secretos o credenciales en las respuestas HTTP.
+    """
+
+
+class GenerativeEngineError(Exception):
+    """Error operativo al comunicarse con el proveedor de IA o validar su salida JSON.
+
+    Se lanza ante fallos de red, timeouts, limites de cuota (HTTP 429) o respuestas
+    malformadas del modelo. La capa API la traduce de forma segura a HTTP 502 Bad Gateway
+    sin exponer stacktraces crudos ni llaves privadas al cliente.
+    """
+
+
 class BaseSupportEngine(ABC):
     """Contrato abstracto que todo motor de analisis de soporte debe implementar."""
 
