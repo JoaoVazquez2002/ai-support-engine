@@ -46,7 +46,7 @@ El proyecto combina **Arquitectura en Capas (Layered Architecture)** con el **Pa
 │ CAPA 3A: MOTOR TRADICIONAL│    │ CAPA 3B: MOTOR GENERATIVO   │
 │ src/engines/traditional.py│    │ src/engines/generative.py   │
 │ IA simbólica con regex y  │    │ Integración real con Gemini │
-│ reglas ponderadas (0% LLM)│    │ API + JSON estructurado     │
+│ reglas ponderadas (0% LLM)│    │ (gemini-3.1-flash-lite)+JSON│
 └───────────────────────────┘    └─────────────────────────────┘
                           ▲
                           │ Contratos compartidos
@@ -66,7 +66,8 @@ ai-support-engine/
 ├── requirements.txt             # Dependencias exactas
 ├── README.md                    # [Entregable 1] Documentación reproducible e índice
 ├── docs/
-│   └── ARQUITECTURA.md          # Arquitectura en capas, Patrón Estrategia y seguridad
+│   ├── ARQUITECTURA.md          # Arquitectura en capas, Patrón Estrategia y seguridad
+│   └── FASE_2_MOTOR_GENERATIVO.md # Detalle técnico del motor Gemini (gemini-3.1-flash-lite)
 ├── src/
 │   ├── __init__.py
 │   ├── schemas.py               # [Capa Dominio] Enums y modelos Pydantic (contrato único)
@@ -78,7 +79,7 @@ ai-support-engine/
 │       ├── __init__.py
 │       ├── base.py              # [Interfaz Estrategia] BaseSupportEngine + excepciones
 │       ├── traditional.py       # [Estrategia 1] Motor simbólico por reglas (0% LLM)
-│       └── generative.py        # [Estrategia 2] Motor generativo real (Gemini API)
+│       └── generative.py        # [Estrategia 2] Motor real Gemini (`gemini-3.1-flash-lite`)
 ├── tests/
 │   └── test_api.py              # Pruebas automatizadas (normal, límites, fallos 422/502/503)
 ├── scripts/
@@ -92,7 +93,7 @@ ai-support-engine/
 ```
 
 ### Ventajas de esta arquitectura
-1. **Intercambiabilidad total:** `TraditionalEngine` y `GenerativeEngine` implementan la clase abstracta `BaseSupportEngine` (`src/engines/base.py`), por lo que devuelven exactamente el mismo tipo `AnalyzeResponse`.
+1. **Intercambiabilidad total:** `TraditionalEngine` y `GenerativeEngine` implementan la clase abstracta `BaseSupportEngine` (`src/engines/base.py`), por lo que devuelven exactamente el mismo tipo `AnalyzeResponse`. El detalle de implementación de Gemini (`gemini-3.1-flash-lite`, defensa contra *Prompt Injection* y validación de esquema) se documenta en [FASE_2_MOTOR_GENERATIVO.md](./FASE_2_MOTOR_GENERATIVO.md).
 2. **Desacoplamiento entre transporte e IA:** `main.py` no conoce expresiones regulares ni el SDK `google-genai`; solo delega al servicio y maneja códigos de estado HTTP.
 3. **Comparabilidad justa:** Ninguno de los motores altera la lógica del otro; la evaluación comparativa mide ambos enfoques en igualdad de condiciones.
 
